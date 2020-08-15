@@ -23,3 +23,5 @@ dependencies:
   - scikit-image
   - shapely
   - yacs
+  - pip:
+    - ../dsntnn
