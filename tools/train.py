@@ -107,6 +107,8 @@ def main():
         model_mod = models.pose_hrnet
     elif cfg.MODEL.NAME == 'pose_resnet':
         model_mod = models.pose_resnet
+    elif cfg.MODEL.NAME == 'pose_hrnet_dsnt':
+        model_mod = models.pose_hrnet_dsnt
     else:
         raise RuntimeError(f"Invalid model {cfg.MODEL.NAME} specified.")
 
@@ -133,6 +135,8 @@ def main():
     logger.info(get_model_summary(model, dump_input))
 
     model = torch.nn.DataParallel(model, device_ids=cfg.GPUS).cuda()
+
+    # CONTINUE HERE with dsnt changes ============>
 
     # define loss function (criterion) and optimizer
     criterion = JointsMSELoss(
