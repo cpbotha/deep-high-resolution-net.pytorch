@@ -42,6 +42,7 @@ class CoordRegressionNetwork(nn.Module):
     def __init__(self, n_locations):
         super().__init__()
         self.fcn = FCN()
+        # 1x1 convolution from 16 in-channels (output of FCN) to n_locations out-channels
         self.hm_conv = nn.Conv2d(16, n_locations, kernel_size=1, bias=False)
 
     def forward(self, images):
@@ -71,14 +72,22 @@ plt.show()
 
 # %%
 
+# 3 x 40 x 40
 raccoon_face_tensor = torch.from_numpy(raccoon_face).permute(2, 0, 1).float()
+# 1 x 3 x 40 x 40
 input_tensor = raccoon_face_tensor.div(255).unsqueeze(0)
 input_var = input_tensor.cuda()
 
+# 1 x 1 x 2
+# I would expect eye_y (rows) to go first?
 eye_coords_tensor = torch.Tensor([[[eye_x, eye_y]]])
+# 1 x 1 x 2
+# e.g. right-most x-coord 39: (39 * 2 + 1) / 40 - 1 = 0.975 which is < 1
+# e.g. left-most x-coord 0: 1 / 40 - 1 = -0.975 which is > -1
 target_tensor = (eye_coords_tensor * 2 + 1) / torch.Tensor(image_size) - 1
 target_var = target_tensor.cuda()
 
+# squeeze out the outer 1-d hierarchy from 1x1x2 to just 2
 print('Target: {:0.4f}, {:0.4f}'.format(*list(target_tensor.squeeze())))
 
 # %% setup the network
